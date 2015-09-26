@@ -1,0 +1,57 @@
+.tag-list {
+    overflow: auto;
+}
+.tag-list ul {
+    float: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tag-list li {
+    float: left;
+    margin-right: 8px;
+}
+
+.tag {
+    padding: 2px 7px 2px 12px;
+    text-align: center;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.tag:hover {
+    background: #efefef
+}
+
+.tag .remove {
+    color: #ccc;
+    font-size: 20px;
+    padding: 0 5px;
+    cursor: pointer;
+}
+
+.tag .remove:hover {
+    color: #000;
+}
+
+.tag-input {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+    color: #555;
+    height: 34px;
+    padding: 6px 12px;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+}
+
+.tag-input:focus {
+    border-color: #66afe9;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6);
+    outline: 0 none;
+}

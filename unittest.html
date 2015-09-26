@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Lite-ng unit test</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.19.0.css">
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="http://code.jquery.com/qunit/qunit-1.19.0.js"></script>
+    <script src="js/object-watch.js"></script>
+    <script src="js/object-observe-lite.js"></script>
+    <script src="js/array-observe.js"></script>
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="js/lng.js"></script>
+    <script>
+        //Expression.func
+        QUnit.test( "Expression.func test", function( assert ) {
+            assert.throws(function(){
+                try{
+                    Expression.func();
+                } catch (e) {
+                    throw e;
+                }
+            }, "empty is not function!" );
+            assert.throws(function(){
+                try{
+                    Expression.func("add");
+                } catch (e) {
+                    throw e;
+                }
+            }, "add is not function!!" );
+            assert.propEqual( Expression.func("add ()"), {name:"add",attrs:""}, 'add() return: {name="add", attribute:""}' );
+            assert.propEqual( Expression.func("add (value1)"), {name:"add",attrs:"value1"},'add (value1) return: {name="add", attribute:"value1"}' );
+            assert.propEqual( Expression.func("add_value (value_1, value_2)"), {name:"add_value",attrs:"value_1, value_2"}, 'add_value (value_1, value_2) return: {name="add_value", attribute:"value_1, value_2"}' );
+        });
+
+
+        //Expression.repeat
+        QUnit.test( "Expression.repeat test", function( assert ) {
+            assert.throws(function(){
+                try{
+                    Expression.repeat();
+                } catch (e) {
+                    throw e;
+                }
+            }, "empty is not repeate expression!" );
+            assert.throws(function(){
+                try{
+                    Expression.repeat("element parent");
+                } catch (e) {
+                    throw e;
+                }
+            }, "element parent is not repeate expression!!" );
+            assert.propEqual( Expression.repeat("element   in array"), {lhs:"element", rhs:"array"}, 'element   in array return: {lhs:"element", rhs:"array"}' );
+        });
+
+
+        //Expression.isFunction
+        QUnit.test( "Expression.isFunction test", function( assert ) {
+            assert.equal( Expression.isFunction(), false, 'empty return false' );
+            assert.equal( Expression.isFunction("abc"), false, 'abc return false' );
+            assert.equal( Expression.isFunction("abc()"), true, 'abc() return true' );
+            assert.equal( Expression.isFunction("abc(a,b,c,d)"), true, 'abc(a,b,c,d) return true' );
+        });
+
+
+
+        //_lngScope
+        var _lngScope = new LngScope();
+        _lngScope.val1 = 0;
+        _lngScope.array1 = ['v1','v2','v3'];
+        _lngScope.function1 = function(){return 'function1'};
+        _lngScope.object1 = {f1:function(){return 'object.f1'}, v1:'v1', a1:[1,2,3]};
+
+        //_lngScope.getVariable
+        QUnit.test( "_lngScope.getVariable test", function( assert ) {
+            assert.equal(_lngScope.getVariable(), false, "empty is return false");
+            assert.equal(_lngScope.getVariable("lalala"), false, "lalala is not a variable return false");
+            assert.equal(_lngScope.getVariable("val1"), 0, "val1 is equal 0");
+            assert.propEqual(_lngScope.getVariable("array1"), ['v1','v2','v3'], "array1 is equal ['v1','v2','v3']");
+            assert.equal(_lngScope.getVariable("function1")(), 'function1', "function1 is a funciton return function1");
+            assert.equal(_lngScope.getVariable("object1.v2"), false, "object1.v2 is not in variable, return false");
+            assert.equal(_lngScope.getVariable("object1.v1"), 'v1', "object1.v1 is return v1");
+            assert.propEqual(_lngScope.getVariable("object1.a1"), [1,2,3], "object1.a1 is equal [1,2,3]");
+            assert.equal(_lngScope.getVariable("object1.f1")(), 'object.f1', "object.f1 is a funciton return object.f1");
+        });
+
+        //_lngScope.getFunction
+        _lngScope.add_1 = 99;
+        _lngScope.add_2 = 2;
+        _lngScope.math = {add: function(a, b){return a+b;}};
+        QUnit.test( "_lngScope.getFunction test", function( assert ) {
+            assert.equal(_lngScope.getFunction(), false, "empty is return false");
+            assert.throws(function(){
+                try{
+                    _lngScope.getFunction("lalala");
+                } catch (e) {
+                    throw e;
+                }
+            }, "lalala is not a function throw error" );
+            assert.equal(_lngScope.getFunction("val1()"), false, "val1 is not a function return false");
+            var find ;
+            find = _lngScope.getFunction("function1()");
+            assert.equal(find.func.apply(_lngScope, find.attrs), "function1", "function1 is return function1");
+            find = _lngScope.getFunction("object1.f1()");
+            assert.equal(find.func.apply(_lngScope, find.attrs), "object.f1", "object.f1 is return object.f1");
+            find = _lngScope.getFunction("math.add(add_1, add_2)");
+            assert.equal(find.func.apply(_lngScope, find.attrs), 101, "math.add(add_1, add_2) is return 101");
+        });
+
+
+        //_lngScope.getWatchVariable
+        QUnit.test( "_lngScope.getWatchVariable test", function( assert ) {
+            assert.equal(_lngScope.getWatchVariable(), false, "empty is false");
+            assert.equal(_lngScope.getWatchVariable('lalala'), false, "lalala is false");
+            var find;
+            find = _lngScope.getWatchVariable('val1');
+            assert.equal(find.variable[find.prop], 0, "val1 is 0");
+            find = _lngScope.getWatchVariable('array1');
+            assert.propEqual(find.variable[find.prop], ['v1','v2','v3'], "array1 is equal ['v1','v2','v3']");
+            find = _lngScope.getWatchVariable('function1');
+            assert.equal(find.variable[find.prop](), "function1", "function1 is a funciton return function1");
+            find = _lngScope.getWatchVariable('object1.v2');
+            assert.equal(find, false, "object1.v2 is not in variable, return false");
+            find = _lngScope.getWatchVariable('object1.v1');
+            assert.equal(find.variable[find.prop], "v1", "object1.v1 is return v1");
+            find = _lngScope.getWatchVariable('object1.a1');
+            assert.propEqual(find.variable[find.prop], [1,2,3], "object1.a1 is equal [1,2,3]");
+            find = _lngScope.getWatchVariable('object1.f1');
+            assert.equal(find.variable[find.prop](), 'object.f1', "object.f1 is a funciton return object.f1");
+        });
+
+
+        //_lngScope.setAlias
+        _lngScope.setAlias('alias_value', 123);
+        QUnit.test( "_lngScope.setAlias test", function( assert ) {
+            assert.equal(_lngScope.getVariable('alias_value'), 123, "alias_value is 123 getVariable");
+            var find = _lngScope.getWatchVariable('alias_value');
+            assert.equal(find.variable[find.prop], 123, "alias_value is 123 getWatchVariable");
+        });
+
+
+        //_lngScope.setModel
+        QUnit.test( "_lngScope.setModel test", function( assert ) {
+            assert.throws(function(){
+                try{
+                    _lngScope.setModel('', function(value){},function(value) {});
+                } catch (e) {
+                    throw e;
+                }
+            }, "prop is empty, throw error" );
+            assert.throws(function(){
+                try{
+                    _lngScope.setModel('setter1', 1, function(value){});
+                } catch (e) {
+                    throw e;
+                }
+            }, "setter is not function, throw error" );
+            assert.throws(function(){
+                try{
+                    _lngScope.setModel('', function(value){}, 1);
+                } catch (e) {
+                    throw e;
+                }
+            }, "getter is not function, throw error" );
+
+            _lngScope.setModel(
+                'setter_test',
+                function(value) {
+                    return value * 10;
+                },
+                function(value) {
+                    return value;
+                }
+            );
+            _lngScope.setter_test = 1;
+            assert.equal(_lngScope.setter_test, 10, "setter_test is value*10 = 10");
+            _lngScope.setModel(
+                'getter_test',
+                function(value) {
+                    return value;
+                },
+                function(value) {
+                    return value + " world";
+                }
+            );
+            _lngScope.getter_test = "hello";
+            assert.equal(_lngScope.getter_test, "hello world", "getter_test is hello world");
+        });
+
+
+        //_lngScope.$watch
+        _lngScope.watch_v1 = 0;
+        QUnit.test( "_lngScope.$watch test", function( assert ) {
+            assert.throws(function(){
+                try{
+                    _lngScope.$watch("lalala", function(prop, oldval, newval) {});
+                } catch (e) {
+                    throw e;
+                }
+            }, "lalala is not a variable throw error" );
+            _lngScope.$watch("watch_v1", function(prop, oldval, newval) {
+                newval = newval + 1;
+                return newval;
+            })
+            _lngScope.watch_v1 = 1;
+            assert.equal(_lngScope.watch_v1, 2, "watch_v1 is 2");
+            //double watch
+            _lngScope.$watch("watch_v1", function(prop, oldval, newval) {
+                newval = newval + 1;
+                return newval;
+            })
+            _lngScope.watch_v1 = 1;
+            assert.equal(_lngScope.watch_v1, 3, "watch_v1 is 3");
+        });
+
+
+        //_lngScope.$unwatch
+        QUnit.test( "_lngScope.$unwatch test", function( assert ) {
+            assert.throws(function(){
+                try{
+                    _lngScope.$unwatch("lalala");
+                } catch (e) {
+                    throw e;
+                }
+            }, "lalala is not a variable throw error" );
+            _lngScope.$unwatch("watch_v1");
+            _lngScope.watch_v1 = 1;
+            assert.equal(_lngScope.watch_v1, 1, "watch_v1 is 1");
+        });
+
+
+        //_lngScope.$observe
+        QUnit.test( "_lngScope.$observe test", function( assert ) {
+            assert.throws(function(){
+                try{
+                    _lngScope.$observe("lalala", function(change) {});
+                } catch (e) {
+                    throw e;
+                }
+            }, "lalala is not a object throw error" );
+            assert.throws(function(){
+                try{
+                    _lngScope.$observe("watch_v1", function(change) {});
+                } catch (e) {
+                    throw e;
+                }
+            }, "watch_v1 is not a object throw error" );
+            var length = _lngScope.array1.length;
+            _lngScope.$observe("array1", function(changes) {
+                var lastevent = changes.pop();
+                length = lastevent.object.length;
+            });
+            _lngScope.array1.push("v4");
+            setTimeout(function(){
+                assert.equal(length, 4, "length is 4");
+            }, 1)
+        });
+    </script>
+</body>
+</html>
