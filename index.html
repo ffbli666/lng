@@ -3,41 +3,12 @@
     <meta http-equiv='content-type' content='text/html; charset=utf-8'>
     <title></title>
     <script src='js/jquery-1.11.0.min.js'></script>
-    <script src='js/asyncUpload.js'></script>
     <link href='css/bootstrap.min.css' rel='stylesheet'>
     <style>
-        .hiden {
-            display: none;
-        }
-
-        .progress {
-            margin-bottom: 0px
-        }
-
-        .progress_container {
-            width:  500px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            min-height: 28px;
-        }
-
-        .progress_container .item  {
-            padding: 4px;
-            display: flex;
-        }
-
-        .progress_container .filename {
-            flex:1;
-        }
-
-        .progress_container .progress_area {
-            width: 200px;
-            padding: 0 10px;
-        }
-
-        .progress_container .cancel_area {
-            width:71px;
-        }
+    .todo :checked {
+      text-decoration: line-through;
+      color: grey;
+    }
     </style>
 </head>
 <body>
@@ -46,8 +17,70 @@
     <ul>
         <li><a href='sample/taginput.html'>taginput</a></li>
     </ul>
+    <div id="demo1">
+        <label>Name:</label>
+        <input type="text" ng-model="yourName" placeholder="Enter a name here">
+        <hr>
+        <h1>Hello <span ng-bind="yourName"></span>!</h1>
+    </div>
+    <h2>Todo</h2>
+
+    <div id="demo2">
+        <span>{{remaining()}} of <span ng-bind="todos.length"></span> remaining</span>
+        [ <a href="" ng-click="archive()">archive</a> ]
+        <ul class="unstyled">
+            <li ng-repeat="todo in todos">
+                <input type="checkbox" ng-model="todo.done">
+                <span class="todo" ng-bind="todo.text"></span>
+            </li>
+        </ul>
+        <form ng-submit="addTodo()">
+            <input type="text" ng-model="todoText"  size="30" placeholder="add new todo here">
+            <input class="btn-primary" type="submit" value="add">
+        </form>
+    </div>
 </div>
 </body>
 </html>
+<!--Polyfill-->
+<script src="js/object-watch.js"></script>
+<!--Polyfill-->
+<script src="js/object-observe-lite.js"></script>
+<!--Polyfill-->
+<script src="js/array-observe.js"></script>
+<script src="js/jquery-1.11.0.min.js"></script>
+<script src="js/lng.js"></script>
+<script src="js/taginput.js"></script>
 <script>
+var demo1 = $('#demo1').lng(function($scope){return;});
+var demo2 = $('#demo2').lng(function($scope){
+    var todoList = $scope;
+    todoList.todos = [
+        {text:'learn angular', done:true},
+        {text:'build an angular app', done:false}
+    ];
+
+    todoList.addTodo = function() {
+        console.log('add');
+        todoList.todos.push({text:todoList.todoText, done:false});
+        todoList.todoText = '';
+    };
+
+    todoList.remaining = function() {
+      var count = 0;
+      angular.forEach(todoList.todos, function(todo) {
+        count += todo.done ? 0 : 1;
+      });
+      return count;
+    };
+
+    todoList.archive = function() {
+        var oldTodos = todoList.todos;
+        todoList.todos = [];
+        oldTodos.forEach(function(todo) {
+            todoList.todos.push(todo);
+        });
+    };
+    return;
+});
 </script>

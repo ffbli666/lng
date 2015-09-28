@@ -16,7 +16,7 @@ var Expression = (function() {
         var regex = /^([\w\d.]+)[ ]*\(([\w\d, .]*)\)$/;
         var match = string.trim().match(regex);
         if (match === null) {
-            throw "Function expression parse error e.g. helloWorld()";
+            throw 'Function expression parse error e.g. helloWorld()';
         };
         return {
             name: match[1].trim(),
@@ -25,10 +25,10 @@ var Expression = (function() {
     };
 
     var repeat = function (string) {
-        var regex = /^([\w\d]+)[ ]*in[ ]([\w\d]+)$/;
+        var regex = /^([\w\d]+)[ ]*in[ ]([\w\d.]+)$/;
         var match = string.trim().match(regex);
         if (match === null) {
-            throw "Repeat expression parse error e.g. element in array";
+            throw 'Repeat expression parse error e.g. element in array';
         };
         return {
             lhs: match[1].trim(),
@@ -50,7 +50,7 @@ var LngScope = function() {
         var find = getWatchVariable.bind(this)(string);
         // console.log(find);
         if (!find) {
-            throw "$watch can not found the property:" + string;
+            throw '$watch can not found the property:' + string;
             return false;
         }
         var needWatch = find.variable;
@@ -88,7 +88,7 @@ var LngScope = function() {
     var unwatch = function(string) {
         var find = getWatchVariable.bind(this)(string);
         if (!find) {
-            throw "$unwatch can not found the property:" + string;
+            throw '$unwatch can not found the property:' + string;
             return false;
         }
         var needUnwatch = find.variable;
@@ -109,17 +109,17 @@ var LngScope = function() {
     var observe = function(string, hander) {
         var find = getWatchVariable.bind(this)(string);
         if (!find) {
-            throw "$watch can not found the property:" + string;
+            throw '$watch can not found the property:' + string;
             return false;
         }
         var needWatch = find.variable;
         var prop = find.prop;
-        // if (typeof needWatch[prop] !== "object") {
-        //     throw "this property is not object";
+        // if (typeof needWatch[prop] !== 'object') {
+        //     throw 'this property is not object';
         //     return false;
         // }
-        if (Object.prototype.toString.call(needWatch[prop]) !== "[object Array]") {
-            throw "this property is not object";
+        if (Object.prototype.toString.call(needWatch[prop]) !== '[object Array]') {
+            throw 'this property is not object';
             return false;
         }
         Array.observe(needWatch[prop], function(changes) {
@@ -160,7 +160,7 @@ var LngScope = function() {
                     return false;
                     // return {
                     //     variable: _alias[index],
-                    //     prop: "variable"
+                    //     prop: 'variable'
                     // }
                 }
                 var prop = props.pop();
@@ -204,7 +204,7 @@ var LngScope = function() {
             return variable;
         }
         var firstProp = props.splice(0, 1).toString().trim();
-        if (firstProp == "") {
+        if (firstProp == '') {
             return variable;
         }
 
@@ -261,10 +261,10 @@ var LngScope = function() {
 
     var setModel = function(prop, set, get) {
         if (!prop) {
-            throw "prop is empty";
+            throw 'prop is empty';
         }
         if (typeof set !== 'function' || typeof get !== 'function') {
-            throw "set or get not function";
+            throw 'set or get not function';
         }
         var value = this[prop];
         var setter = function (val) {
@@ -315,7 +315,8 @@ var LngCore = function(selecton, lngScope) {
                 'mouseleave',
                 'mousemove',
                 'mouseover',
-                'mouseup'
+                'mouseup',
+                'submit'
             ];
             var self = this;
             var $scope = new LngScope();
@@ -338,7 +339,7 @@ var LngCore = function(selecton, lngScope) {
                             var variable = $scope.getVariable(value);
                             //variable that is string can not watch
                             if (variable) {
-                                if (typeof variable === "object") {
+                                if (typeof variable === 'object') {
                                     $(element).html(variable.toSource());
                                 }
                                 else {
@@ -355,7 +356,7 @@ var LngCore = function(selecton, lngScope) {
 
                         $scope.$watch(value, function(prop, oldval, newval){
                             //console.log(newval);
-                            if (typeof newval === "object") {
+                            if (typeof newval === 'object') {
                                 $(element).html(newval.toSource());
                             }
                             else {
@@ -386,8 +387,10 @@ var LngCore = function(selecton, lngScope) {
                     if (!findfunc) {
                         return;
                     }
-
                     $(element).on(event, function(e) {
+                        if (event === 'submit' || event === 'click') {
+                            e.preventDefault();
+                        };
                         findfunc.attrs.unshift(e);
                         findfunc.func.apply(this, findfunc.attrs);
                     });
@@ -399,6 +402,10 @@ var LngCore = function(selecton, lngScope) {
                 items.each( function( index, element ) {
                     var modelObj = $(element);
                     var prop = modelObj.attr('ng-model').trim();
+                    $scope[prop] = modelObj.val();
+                    modelObj.on('keyup', function(e) {
+                        $scope[prop] = modelObj.val();
+                    });
                     //prop, setter, getter
                     $scope.setModel(
                         prop,
@@ -407,18 +414,18 @@ var LngCore = function(selecton, lngScope) {
                             return value;
                         },
                         function(value) {
-                            return modelObj.val();
+                            return value;
                         }
                     );
                 });
             }
 
             var render = function(dom) {
+                model(dom);
                 bind(dom);
                 eventList.forEach( function(event) {
-                    registerEvent(renderObj.dom, event);
+                    registerEvent(dom, event);
                 });
-                model(dom);
             };
 
             // init get need render dom
@@ -442,16 +449,14 @@ var LngCore = function(selecton, lngScope) {
                     }
 
                     $scope.$watch (repeatEp.rhs, function(prop, oldval, newval) {
+                        console.log(oldval);
+                        console.log(newval);
                         renderObj.parent.empty();
                         newval.forEach( function(item) {
                             var temp = renderObj.dom.clone();
                             //console.log(item);
                             $scope.setAlias(repeatEp.lhs, item);
-                            bind(temp);
-                            eventList.forEach( function(event) {
-                                registerEvent(temp, event);
-                            });
-                            model(temp);
+                            render(temp);
                             renderObj.parent.append(temp);
                         });
                         return newval;
@@ -465,7 +470,7 @@ var LngCore = function(selecton, lngScope) {
                         //it is rerender, now
                         $scope.$observe (repeatEp.rhs, function(changes){
                             //unbind
-                            //console.log(changes);
+                            console.log(changes);
                             var event = changes[0];
                             event.removed.forEach(function(item){
                                 $scope.setAlias(repeatEp.lhs, item);
@@ -483,11 +488,7 @@ var LngCore = function(selecton, lngScope) {
                     }
                 }
                 else {
-                    bind(renderObj.dom);
-                    eventList.forEach( function(event) {
-                        registerEvent(renderObj.dom, event);
-                    });
-                    model(renderObj.dom);
+                    render(renderObj.dom);
                 }
             });
             //init watch render
@@ -498,7 +499,7 @@ var LngCore = function(selecton, lngScope) {
 
             //copy customer function to the jquery object
             for(var key in customer) {
-                if (key !=="val" && self[key] !== undefined) continue;
+                if (key !=='val' && self[key] !== undefined) continue;
                 self[key] = customer[key];
             };
 
