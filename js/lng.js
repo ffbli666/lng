@@ -106,26 +106,25 @@ var LngScope = function() {
         needUnwatch.unwatch(prop);
     };
 
-    var observe = function(string, hander) {
-        var find = getWatchVariable.bind(this)(string);
-        if (!find) {
-            throw '$watch can not found the property:' + string;
-            return false;
-        }
-        var needWatch = find.variable;
-        var prop = find.prop;
-        // if (typeof needWatch[prop] !== 'object') {
-        //     throw 'this property is not object';
-        //     return false;
-        // }
-        if (Object.prototype.toString.call(needWatch[prop]) !== '[object Array]') {
-            throw 'this property is not object';
-            return false;
-        }
-        Array.observe(needWatch[prop], function(changes) {
-            hander.call(this, changes);
-        });
+    var _observe = [];
+    var observe = function(variable, hander) {
+        //console.log(_observe);
+        var index = _observe.indexOf(variable);
+        //console.log('on: ' + index);
+        if (index >= 0)
+            return;
+        _observe.push(variable);
+        Array.observe(variable, hander);
     }
+
+    var unobserve = function(variable) {
+        //console.log(_observe);
+        var index = _observe.indexOf(variable);
+        //console.log('un: ' + index);
+        if (index < 0) return;
+        _observe.splice(index, 1);
+    }
+
     var getWatchVariable = function (string) {
         if (!string) {
             return false;
@@ -257,7 +256,7 @@ var LngScope = function() {
 
     var findAlias = function(alias) {
         return _alias.map(function(e) { return e.alias; }).indexOf(alias)
-    }
+    };
 
     var setModel = function(prop, set, get) {
         if (!prop) {
@@ -289,9 +288,10 @@ var LngScope = function() {
         getWatchVariable: getWatchVariable,
         setAlias: setAlias,
         setModel: setModel,
-        $watch:watch,
-        $unwatch:unwatch,
-        $observe:observe
+        $watch: watch,
+        $unwatch: unwatch,
+        $observe: observe,
+        $unobserve: unobserve
     };
 };
 
@@ -378,7 +378,7 @@ var LngCore = function(selecton, lngScope) {
                         $scope.$unwatch(value);
                     }
                 });
-            }
+            };
 
             var registerEvent = function (dom, event) {
                 var items = dom.find('[ng-' + event + ']');
@@ -418,7 +418,7 @@ var LngCore = function(selecton, lngScope) {
                         }
                     );
                 });
-            }
+            };
 
             var render = function(dom) {
                 model(dom);
@@ -447,10 +447,31 @@ var LngCore = function(selecton, lngScope) {
                     if (!rhs || !rhs instanceof Array) {
                         return ;
                     }
+                    //todo
+                    //maybe do the diff
+                    //it is rerender, now
+                    var obs = function(changes){
+                        //unbind
+                        console.log(changes);
+                        var event = changes[0];
+                        if (event.removed) {
+                            event.removed.forEach(function(item){
+                                $scope.setAlias(repeatEp.lhs, item);
+                                unbind(renderObj.dom);
+                            });
+                        }
+                        event.object.forEach(function(item){
+                            $scope.setAlias(repeatEp.lhs, item);
+                            unbind(renderObj.dom);
+                        });
 
+                        //re render
+                        var watch = $scope.getWatchVariable(repeatEp.rhs);
+                        var newval = watch.variable[watch.prop].slice(0, watch.variable[watch.prop].length);
+                        watch.variable[watch.prop] = newval;
+                    }
                     $scope.$watch (repeatEp.rhs, function(prop, oldval, newval) {
-                        console.log(oldval);
-                        console.log(newval);
+                        //console.log(oldval);
                         renderObj.parent.empty();
                         newval.forEach( function(item) {
                             var temp = renderObj.dom.clone();
@@ -459,32 +480,16 @@ var LngCore = function(selecton, lngScope) {
                             render(temp);
                             renderObj.parent.append(temp);
                         });
+                        $scope.$unobserve(oldval);
+                        $scope.$observe(newval, obs);
+                        //Array.observe(newval, obs);
+                        //console.log(newval);
                         return newval;
                     });
                     //init render
                     var index = renderWatch.indexOf(repeatEp.rhs);
                     if (index < 0) {
                         renderWatch.push(repeatEp.rhs);
-                        //todo
-                        //maybe do the diff
-                        //it is rerender, now
-                        $scope.$observe (repeatEp.rhs, function(changes){
-                            //unbind
-                            console.log(changes);
-                            var event = changes[0];
-                            event.removed.forEach(function(item){
-                                $scope.setAlias(repeatEp.lhs, item);
-                                unbind(renderObj.dom);
-                            });
-                            event.object.forEach(function(item){
-                                $scope.setAlias(repeatEp.lhs, item);
-                                unbind(renderObj.dom);
-                            });
-
-                            //re render
-                            var watch = $scope.getWatchVariable(repeatEp.rhs);
-                            watch.variable[watch.prop] = watch.variable[watch.prop];
-                        });
                     }
                 }
                 else {
@@ -494,7 +499,9 @@ var LngCore = function(selecton, lngScope) {
             //init watch render
             renderWatch.forEach( function( item ) {
                 var watch = $scope.getWatchVariable(item);
-                watch.variable[watch.prop] = watch.variable[watch.prop];
+                //watch.variable[watch.prop] = watch.variable[watch.prop];
+                var newval = watch.variable[watch.prop].slice(0, watch.variable[watch.prop].length);
+                watch.variable[watch.prop] = newval;
             });
 
             //copy customer function to the jquery object

@@ -238,24 +238,18 @@
         QUnit.test( "_lngScope.$observe test", function( assert ) {
             assert.throws(function(){
                 try{
-                    _lngScope.$observe("lalala", function(change) {});
+                    _lngScope.$observe(a, function(change) {});
                 } catch (e) {
                     throw e;
                 }
-            }, "lalala is not a object throw error" );
-            assert.throws(function(){
-                try{
-                    _lngScope.$observe("watch_v1", function(change) {});
-                } catch (e) {
-                    throw e;
-                }
-            }, "watch_v1 is not a object throw error" );
-            var length = _lngScope.array1.length;
-            _lngScope.$observe("array1", function(changes) {
-                var lastevent = changes.pop();
-                length = lastevent.object.length;
+            }, "a is not a object throw error" );
+            var array1 = ['a','b','c'];
+            var length = array1.length;
+            _lngScope.$observe(array1, function(changes) {
+                var event = changes.pop();
+                length = event.object.length;
             });
-            _lngScope.array1.push("v4");
+            array1.push("v4");
             setTimeout(function(){
                 assert.equal(length, 4, "length is 4");
             }, 1)
