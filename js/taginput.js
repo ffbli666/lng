@@ -27,7 +27,6 @@ var TagInput = function($scope) {
     };
 
     $scope.getTags = function() {
-        $scope.tags = [];
         $('.result').append('<li>' + $scope.tags +'</li>');
         return $scope.tags;
     };
