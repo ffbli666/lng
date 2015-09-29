@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv='content-type' content='text/html; charset=utf-8'>
+    <title>Use Angular Implement Tag Input</title>
+    <link href='../css/bootstrap.min.css' rel='stylesheet'>
+    <link href='../css/common.css' rel='stylesheet'>
+    <style>
+    </style>
+</head>
+<body>
+<div class='container-fluid'>
+    <div class='row'>
+        <div class='col-xs-6'>
+            <h1>Demo</h1>
+            <div id="tag-list" name="tag-list" class="tag-list">
+                <ul id='u1'>
+                    <li ng-repeat="tag in tags">
+                        <div class="tag">
+                            <span class="name" ng-bind="tag.name"></span>
+                            <span class="remove" ng-click="removeTag(tag,abc,eee)">x</span>
+                        </div>
+                    </li>
+                </ul>
+                <div>
+                    <input type=text class="tag-input" placeholder="+" ng-keydown="input()" ng-model="tagText">
+                    <button type="button" class="btn btn-primary" ng-click="addTag()">Add Tags</button>
+                    <button type="button" class="btn btn-primary" ng-click="getTags()">Get Tags</button>
+                </div>
+                <p ng-bind="abc"></p>
+                <ul id='u2'>
+                    <li ng-repeat="tag in tags">
+                        <div class="tag">
+                            <span class="name" ng-bind="tag.name"></span>
+                            <span class="remove" ng-click="removeTag(tag,abc,eee)">x</span>
+                        </div>
+                    </li>
+                </ul>
+                <p ng-bind="abc"></p>
+            </div>
+        </div>
+        <div class='col-xs-6'>
+            <h1>Result</h1>
+            <ul class='result'>
+            </ul>
+        </div>
+    </div>
+</div>
+<script src="../js/jquery-1.11.0.min.js"></script>
+<script src="../js/object-watch.js"></script>
+<script src="../js/object-observe-lite.js"></script>
+<script src="../js/array-observe.js"></script>
+<script src="../js/lng.js"></script>
+<script src="../js/lng/taginput.js"></script>
+<script>
+var taginput = $('#tag-list').lng(tagInput);
+</script>
+</body>
+</html>

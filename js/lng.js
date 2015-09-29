@@ -45,7 +45,6 @@ var Expression = (function() {
 var LngScope = function() {
     var _alias = [];
     var _watch = [];
-    var _watch2 = [];
     var _watchlast = 0;
     var watch = function(string, handler) {
         var find = getWatchVariable.bind(this)(string);
@@ -57,8 +56,6 @@ var LngScope = function() {
         var needWatch = find.variable;
         var prop = find.prop;
         var id;
-        var f = _watch2.map(function(e) { return e.variable; }).indexOf(needWatch[prop]);
-        console.log(string + ": " +f);
         if (needWatch[prop + 'handlerID']) {
             id = needWatch[prop + 'handlerID'];
             var index = _watch.map(function(e) { return e.id; }).indexOf(id);
@@ -84,14 +81,7 @@ var LngScope = function() {
             }
             return newval;
         });
-        //console.log(_watch);
-        _watch2.push({
-            variable: needWatch[prop],
-            needWatch: needWatch,
-            prop: prop,
-            handler: [handler]
-        });
-        console.log(_watch2);
+        console.log(_watch);
         return true;
     };
 
@@ -469,10 +459,20 @@ var LngCore = function(selecton, lngScope) {
                         return ;
                     }
 
-                    var observeObj = function() {
+                    $scope.$watch (repeatEp.rhs, function(prop, oldval, newval) {
+                        var value = newval.slice(0, newval.length);
+                        renderObj.parent.empty();
+                        //oldval.length = 0; // can not trigger observe
+                        oldval.splice(0, oldval.length);
+                        value.forEach(function(item){
+                            oldval.push(item);
+                        });
+                        return oldval;
+                    });
+                    var obs = function() {
                         var map = new Map();
                         var handler = function(changes) {
-                            console.log(changes);
+                            //console.log(changes);
                             changes.forEach(function(event){
                                 if (event.removed.length > 0) {
                                     event.removed.forEach(function(item){
@@ -498,20 +498,8 @@ var LngCore = function(selecton, lngScope) {
                         return {
                             handler: handler
                         };
-                    }
+                    }();
 
-                    $scope.$watch (repeatEp.rhs, function(prop, oldval, newval) {
-                        var value = newval.slice(0, newval.length);
-                        renderObj.parent.empty();
-                        //oldval.length = 0; // can not trigger observe
-                        oldval.splice(0, oldval.length);
-                        value.forEach(function(item){
-                            oldval.push(item);
-                        });
-                        return oldval;
-                    });
-
-                    var obs = new observeObj();
                     $scope.$observe (repeatEp.rhs, obs.handler);
 
                     //init render
