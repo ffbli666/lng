@@ -26,7 +26,7 @@
     <h2>Todo</h2>
 
     <div id="demo2">
-        <span>{{remaining()}} of <span ng-bind="todos.length"></span> remaining</span>
+        <span><span ng-bind="remaining()"></span> of <span ng-bind="todos.length"></span> remaining</span>
         [ <a href="" ng-click="archive()">archive</a> ]
         <ul class="unstyled">
             <li ng-repeat="todo in todos">
@@ -68,17 +68,19 @@ var demo2 = $('#demo2').lng(function($scope){
 
     todoList.remaining = function() {
       var count = 0;
-      angular.forEach(todoList.todos, function(todo) {
+      todoList.todos.forEach(function(todo) {
         count += todo.done ? 0 : 1;
       });
       return count;
     };
 
     todoList.archive = function() {
-        var oldTodos = todoList.todos;
+        var oldTodos = todoList.todos.slice(0, todoList.todos.length);
+        //var oldTodos = todoList.todos;
         todoList.todos = [];
         oldTodos.forEach(function(todo) {
-            todoList.todos.push(todo);
+            console.log(todo);
+            if (!todo.done) todoList.todos.push(todo);
         });
     };
     return;

@@ -81,7 +81,7 @@ var LngScope = function() {
             }
             return newval;
         });
-        console.log(_watch);
+        //console.log(_watch);
         return true;
     };
 
@@ -270,22 +270,22 @@ var LngScope = function() {
         return _alias.map(function(e) { return e.alias; }).indexOf(alias)
     };
 
-    var setModel = function(prop, set, get) {
+    var setModel = function(variable, prop, set, get) {
         if (!prop) {
             throw 'prop is empty';
         }
         if (typeof set !== 'function' || typeof get !== 'function') {
             throw 'set or get not function';
         }
-        var value = this[prop];
+        var value = variable[prop];
         var setter = function (val) {
-                value = set.call(this, val);
+                value = set.call(variable, val);
             };
         var getter = function () {
-                return get.call(this, value);
+                return get.call(variable, value);
             };
-        if (delete this[prop]) {
-            Object.defineProperty(this, prop, {
+        if (delete variable[prop]) {
+            Object.defineProperty(variable, prop, {
                 set: setter,
                 get: getter,
                 enumerable: true,
@@ -411,22 +411,47 @@ var LngCore = function(selecton, lngScope) {
                 var items = dom.find('[ng-model]');
                 items.each( function( index, element ) {
                     var modelObj = $(element);
-                    var prop = modelObj.attr('ng-model').trim();
-                    $scope[prop] = modelObj.val();
-                    modelObj.on('keyup', function(e) {
-                        $scope[prop] = modelObj.val();
-                    });
-                    //prop, setter, getter
+                    var value = modelObj.attr('ng-model').trim();
+                    console.log(value);
+                    var watch = $scope.getWatchVariable(value);
+                    if (!watch) {
+                        $scope[value] = '';
+                        watch = $scope.getWatchVariable(value);
+                    }
+                    //variable, prop, setter, getter
                     $scope.setModel(
-                        prop,
+                        watch.variable,
+                        watch.prop,
                         function(value) {
-                            modelObj.val(value);
+                            if (modelObj.is(':checkbox')){
+                                element.checked = value;
+                            }
+                            else {
+                                modelObj.val(value);
+                            }
                             return value;
                         },
                         function(value) {
                             return value;
                         }
                     );
+                    //init ui render
+                    watch.variable[watch.prop] = watch.variable[watch.prop];
+
+                    //event
+                    if (modelObj.is(':checkbox')){
+                        modelObj.on('change', function(e) {
+                            watch.variable[watch.prop] = element.checked;
+                        });
+                    }
+                    else { //input text, password
+                        //todo
+                        // need change event
+                        // keyup not good event
+                        modelObj.on('keyup', function(e) {
+                            watch.variable[watch.prop] = modelObj.val();
+                        });
+                    }
                 });
             };
 
@@ -478,6 +503,11 @@ var LngCore = function(selecton, lngScope) {
                                     event.removed.forEach(function(item){
                                         var dom = map.get(item);
                                         if (dom) {
+                                            $scope.setAlias(repeatEp.lhs, item);
+                                            //todo
+                                            // need remove the dom event
+                                            // but now is remove all the variable event
+                                            unbind(dom);
                                             dom.remove();
                                         }
                                     });
@@ -516,7 +546,6 @@ var LngCore = function(selecton, lngScope) {
             renderWatch.forEach( function( item ) {
                 var watch = $scope.getWatchVariable(item);
                 watch.variable[watch.prop] = watch.variable[watch.prop];
-
             });
 
             //copy customer function to the jquery object
