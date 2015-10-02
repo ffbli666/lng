@@ -5,39 +5,59 @@
     <script src='js/jquery-1.11.0.min.js'></script>
     <link href='css/bootstrap.min.css' rel='stylesheet'>
     <style>
-    .todo :checked {
+    .row {
+        margin: 0 0 80px 0;
+
+    }
+    .todo-true {
       text-decoration: line-through;
       color: grey;
     }
+
     </style>
 </head>
 <body>
-<div class='container-fluid'>
-    <h1>Demo</h1>
-    <ul>
-        <li><a href='sample/taginput.html'>taginput</a></li>
-    </ul>
-    <div id="demo1">
-        <label>Name:</label>
-        <input type="text" ng-model="yourName" placeholder="Enter a name here">
-        <hr>
-        <h1>Hello <span ng-bind="yourName"></span>!</h1>
+<div class='container'>
+    <div class="row">
+        <div id="demo1">
+            <h1>Demo 1</h1>
+            <label>Name:</label>
+            <input type="text" ng-model="yourName" placeholder="Enter a name here">
+            <hr>
+            <h1>Hello <span ng-bind="yourName"></span>!</h1>
+        </div>
     </div>
-    <h2>Todo</h2>
-
-    <div id="demo2">
-        <span><span ng-bind="remaining()"></span> of <span ng-bind="todos.length"></span> remaining</span>
-        [ <a href="" ng-click="archive()">archive</a> ]
-        <ul class="unstyled">
-            <li ng-repeat="todo in todos">
-                <input type="checkbox" ng-model="todo.done">
-                <span class="todo" ng-bind="todo.text"></span>
-            </li>
-        </ul>
-        <form ng-submit="addTodo()">
-            <input type="text" ng-model="todoText"  size="30" placeholder="add new todo here">
-            <input class="btn-primary" type="submit" value="add">
-        </form>
+    <div class="row">
+        <div id="demo2">
+            <h1>Demo 2</h1>
+            <h3>Todo</h3>
+            <span><span ng-bind="remaining()"></span> of <span ng-bind="todos.length"></span> remaining</span>
+            [ <a href="" ng-click="archive()">archive</a> ]
+            <ul class="unstyled">
+                <li ng-repeat="todo in todos">
+                    <input type="checkbox" ng-model="todo.done" ng-change='change()'>
+                    <span class="done-{{todo.done}}" ng-bind="todo.text"></span>
+                </li>
+            </ul>
+            <form ng-submit="addTodo()">
+                <input type="text" ng-model="todoText"  size="30" placeholder="add new todo here">
+                <input class="btn-primary" type="submit" value="add">
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div id="demo3">
+            <h1>Demo 3</h1>
+            <div>Seconds Elapsed: <span ng-bind='secondsElapsed'></span></div>
+        </div>
+    </div>
+    <div class="row">
+        <div id="sample">
+            <h1>Other Sample</h1>
+            <ul>
+                <li><a href="sample/taginput.html" target="_blank">taginput</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 </body>
@@ -52,8 +72,8 @@
 <script src="js/lng.js"></script>
 <script src="js/taginput.js"></script>
 <script>
-var demo1 = $('#demo1').lng(function($scope){return;});
-var demo2 = $('#demo2').lng(function($scope){
+var demo1 = $('#demo1').lng(function($scope) {return;} );
+var demo2 = $('#demo2').lng(function($scope) {
     var todoList = $scope;
     todoList.todos = [
         {text:'learn angular', done:true},
@@ -83,6 +103,25 @@ var demo2 = $('#demo2').lng(function($scope){
             if (!todo.done) todoList.todos.push(todo);
         });
     };
+
+    todoList.change = function() {
+        console.log(this.checked);
+        $(this).parent().find('span').attr('class', (this.checked) ? 'todo-true': '');
+    };
     return;
 });
+
+var demo3 = $('#demo3').lng(function($scope){
+    $scope.secondsElapsed = 0;
+    var start = function() {
+        setInterval( function(){
+            $scope.secondsElapsed ++;
+        },
+        1000);
+    };
+    return {
+        start: start
+    };
+});
+demo3.start();
 </script>

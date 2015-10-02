@@ -27,14 +27,6 @@
                     <button type="button" class="btn btn-primary" ng-click="addTag()">Add Tags</button>
                     <button type="button" class="btn btn-primary" ng-click="getTags()">Get Tags</button>
                 </div>
-                <ul id='u2'>
-                    <li ng-repeat="tag in tags">
-                        <div class="tag">
-                            <span class="name" ng-bind="tag"></span>
-                            <span class="remove" ng-click="removeTag(tag)">x</span>
-                        </div>
-                    </li>
-                </ul>
             </div>
             <button type="button" class="btn btn-primary" onclick="getTagInputVal()">Outsite Get Tags</button>
         </div>
@@ -59,14 +51,6 @@ var tagInput = $('#tag-list').lng(TagInput);
 
 function getTagInputVal() {
     $('.result').append('<li>' + tagInput.val() +'</li>');
-}
-
-function setTagInputVal() {
-    var tags = [
-        {name: 'tag1'},
-        {name: 'tag2'},
-        {name: 'tag3'}
-    ];
 }
 </script>
 </body>

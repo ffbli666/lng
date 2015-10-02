@@ -169,6 +169,7 @@
             }, "getter is not function, throw error" );
 
             _lngScope.setModel(
+                _lngScope,
                 'setter_test',
                 function(value) {
                     return value * 10;
@@ -180,6 +181,7 @@
             _lngScope.setter_test = 1;
             assert.equal(_lngScope.setter_test, 10, "setter_test is value*10 = 10");
             _lngScope.setModel(
+                _lngScope,
                 'getter_test',
                 function(value) {
                     return value;
