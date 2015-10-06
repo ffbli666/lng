@@ -52,6 +52,35 @@
         </div>
     </div>
     <div class="row">
+        <div id="demo4">
+            <h1>Demo 4</h1>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in list">
+                        <th scope="row" ng-bind="user.row">1</th>
+                        <td ng-bind="user.firstname">Mark</td>
+                        <td ng-bind="user.lastname">Otto</td>
+                        <td ng-bind="user.username">@mdo</td>
+                    </tr>
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination">
+                    <li><a href="" ng-click="page(1)">1</a></li>
+                    <li><a href="" ng-click="page(2)">2</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="row">
         <div id="sample">
             <h1>Other Sample</h1>
             <ul>
@@ -81,7 +110,6 @@ var demo2 = $('#demo2').lng(function($scope) {
     ];
 
     todoList.addTodo = function() {
-        console.log('add');
         todoList.todos.push({text:todoList.todoText, done:false});
         todoList.todoText = '';
     };
@@ -99,13 +127,11 @@ var demo2 = $('#demo2').lng(function($scope) {
         //var oldTodos = todoList.todos;
         todoList.todos = [];
         oldTodos.forEach(function(todo) {
-            console.log(todo);
             if (!todo.done) todoList.todos.push(todo);
         });
     };
 
     todoList.change = function() {
-        console.log(this.checked);
         $(this).parent().find('span').attr('class', (this.checked) ? 'todo-true': '');
     };
     return;
@@ -124,4 +150,18 @@ var demo3 = $('#demo3').lng(function($scope){
     };
 });
 demo3.start();
+
+var demo4 = $('#demo4').lng(function($scope){
+    $scope.list = [];
+    $scope.page = function(e, page) {
+        if(!page) page = 1;
+        $.get( "sample/page" + page + ".json", function( data ) {
+            $scope.list = data;
+        });
+    };
+    return {
+        page: $scope.page
+    };
+});
+demo4.page();
 </script>

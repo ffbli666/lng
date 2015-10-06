@@ -247,6 +247,9 @@ var LngScope = function() {
             if (variable) {
                 attrs.push(variable);
             }
+            else {
+                attrs.push(funcAttrs[i]);
+            }
         }
         return {
             func: func,
@@ -401,8 +404,7 @@ var LngCore = function(selecton, lngScope) {
                         if (event === 'submit' || event === 'click') {
                             e.preventDefault();
                         };
-                        findfunc.attrs.unshift(e);
-                        findfunc.func.apply(this, findfunc.attrs);
+                        findfunc.func.apply(this, [e].concat(findfunc.attrs));
                     });
                 });
             };
@@ -412,7 +414,7 @@ var LngCore = function(selecton, lngScope) {
                 items.each( function( index, element ) {
                     var modelObj = $(element);
                     var value = modelObj.attr('ng-model').trim();
-                    console.log(value);
+                    //console.log(value);
                     var watch = $scope.getWatchVariable(value);
                     if (!watch) {
                         $scope[value] = '';
