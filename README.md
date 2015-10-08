@@ -15,6 +15,9 @@ Lite ng
 
 瀏覽器 Observe  和 Watch (firefox 自己的) 未支援，故使用 Polyfill 讓所有瀏覽器支援
 
+#Demo site
+[Demo](http://175.181.41.247/works/lng/)
+
 # 已完成部份
 ### Data Bind
 * ng-model
@@ -51,6 +54,3 @@ Lite ng
 * [Array.Observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe)
 * [Object.defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty)
 * [Object.watch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/watch)
-
-#Demo site
-[Demo](http://175.181.41.247/works/lng/)
