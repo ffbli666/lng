@@ -3,8 +3,6 @@
 
 喜歡 React 只做 MVC 的 V 專心在 UI 上
 
-AngularJS 的野心很大，功能完整且多，不過用起來就複雜許多，如果跟 React 一樣只做 UI 就符合大多數的需求
-
 試著寫一套這樣想法的 Javascript framework
 
 Lite ng
