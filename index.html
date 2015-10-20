@@ -21,15 +21,18 @@
     <div class="row">
         <div id="demo1">
             <h1>Demo 1</h1>
+            <div><a href="http://jsfiddle.net/ffbli/g6sc6qxf/" target="_blank">source code</a></div>
             <label>Name:</label>
             <input type="text" ng-model="yourName" placeholder="Enter a name here">
             <hr>
             <h1>Hello <span ng-bind="yourName"></span>!</h1>
+
         </div>
     </div>
     <div class="row">
         <div id="demo2">
             <h1>Demo 2</h1>
+            <div><a href="http://jsfiddle.net/ffbli/udm07zsk/" target="_blank">source code</a></div>
             <h3>Todo</h3>
             <span><span ng-bind="remaining()"></span> of <span ng-bind="todos.length"></span> remaining</span>
             [ <a href="" ng-click="archive()">archive</a> ]
@@ -48,6 +51,7 @@
     <div class="row">
         <div id="demo3">
             <h1>Demo 3</h1>
+            <div><a href="http://jsfiddle.net/ffbli/djcjg0uu/" target="_blank">source code</a></div>
             <div>Seconds Elapsed: <span ng-bind='secondsElapsed'></span></div>
         </div>
     </div>
@@ -65,10 +69,10 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="user in list">
-                        <th scope="row" ng-bind="user.row">1</th>
-                        <td ng-bind="user.firstname">Mark</td>
-                        <td ng-bind="user.lastname">Otto</td>
-                        <td ng-bind="user.username">@mdo</td>
+                        <th scope="row" ng-bind="user.row"></th>
+                        <td ng-bind="user.firstname"></td>
+                        <td ng-bind="user.lastname"></td>
+                        <td ng-bind="user.username"></td>
                     </tr>
                 </tbody>
             </table>
