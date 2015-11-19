@@ -47,7 +47,7 @@ var LngScope = function() {
     var _watch = [];
     var _watchlast = 0;
     var watch = function(string, handler) {
-        var find = getWatchVariable.bind(this)(string);
+        var find = getWatchVariable.call(this, string);
         // console.log(find);
         if (!find) {
             throw '$watch can not found the property:' + string;
@@ -86,7 +86,7 @@ var LngScope = function() {
     };
 
     var unwatch = function(string) {
-        var find = getWatchVariable.bind(this)(string);
+        var find = getWatchVariable.call(this, string);
         if (!find) {
             throw '$unwatch can not found the property:' + string;
             return false;
@@ -108,7 +108,7 @@ var LngScope = function() {
 
     var _observe = [];
     var observe = function(string, hander) {
-        var find = getWatchVariable.bind(this)(string);
+        var find = getWatchVariable.call(this, string);
         if (!find) {
             throw '$watch can not found the property:' + string;
             return false;
@@ -232,7 +232,7 @@ var LngScope = function() {
         }
         var attrs = [];
         var ep = Expression.func(string);
-        var func = getVariable.bind(this)(ep.name);
+        var func = getVariable.call(this, ep.name);
         if (!func) {
             return false;
         }
