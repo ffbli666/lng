@@ -14,7 +14,7 @@ Lite ng
 瀏覽器 Observe  和 Watch (firefox 自己的) 未支援，故使用 Polyfill 讓所有瀏覽器支援
 
 #Demo site
-[Demo](http://ffbli666.github.io/lng/)
+[Demo](https://ffbli666.github.io/lng/)
 
 # 已完成部份
 ### Data Bind
